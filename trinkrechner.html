@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trink-rechner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .intensity-display {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+        }
+
+        .results {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .water-progress {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .progress-label {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .error {
+            color: #e74c3c;
+            background: #ffe6e6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💧 Wasser-Tracker</h1>
+        
+        <div class="error" id="error"></div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="alter">Alter (Jahre):</label>
+                <input type="number" id="alter" placeholder="z.B. 30" min="1" max="120">
+            </div>
+
+            <div class="form-group">
+                <label for="gewicht">Gewicht (kg):</label>
+                <input type="number" id="gewicht" placeholder="z.B. 75" min="20" max="300" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label for="stadt">Standort (Stadt):</label>
+                <input type="text" id="stadt" placeholder="z.B. Berlin">
+            </div>
+
+            <div class="form-group">
+                <label for="sportStunden">Sport pro Tag (Stunden):</label>
+                <input type="number" id="sportStunden" placeholder="z.B. 1" min="0" max="24" step="0.5">
+            </div>
+
+            <div class="form-group">
+                <label for="intensität">Trainingsintensität (1-10):</label>
+                <input type="range" id="intensität" min="1" max="10" value="5">
+                <div class="intensity-display">
+                    <span id="intensitätAnzeige">5</span>/10
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="getrunkeneGläser">Gläser Wasser bereits getrunken:</label>
+                <input type="number" id="getrunkeneGläser" placeholder="z.B. 2" min="0" step="1">
+            </div>
+
+            <div class="button-group">
+                <button class="btn-calculate" onclick="berechne()">📊 Berechnen</button>
+                <button class="btn-reset" onclick="zurücksetzen()">🔄 Zurücksetzen</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="result-card">
+                <div class="result-item">
+                    <div class="result-label">🌡️ Aktuelle Temperatur:</div>
+                    <div class="result-value" id="temperatur">-</div>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-item">
+                    <div class="result-label">💧 Empfohlene Wassermenge heute:</div>
+                    <div class="result-value" id="empfohlenGläser">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">📌 Basis (Körpergewicht):</div>
+                    <div id="basisMenge">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">⚽ Zusatz (Sport):</div>
+                    <div id="sportZusatz">-</div>
+                </div>
+            </div>
+
+            <div class="water-progress">
+                <div class="progress-label">📈 Fortschritt heute:</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%">
+                        <span id="progressText"></span>
+                    </div>
+                </div>
+                <div class="progress-text" id="progressInfo">0 / 0 Gläser</div>
+            </div>
+
+            <div class="info-box">
+                <strong>📝 Hinweis:</strong> Die Berechnung basiert auf einem Standard-Trinkglas (250ml). 
+                Die empfohlene Menge wird berechnet aus: 
+                <strong>Körpergewicht × 0.035L</strong> + <strong>Sportausgleich</strong> + <strong>Temperaturausgleich</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Intensitätsanzeige aktualisieren
+        document.getElementById('intensität').addEventListener('input', function() {
+            document.getElementById('intensitätAnzeige').textContent = this.value;
+        });
+
+        function showError(message) {
+            const errorBox = document.getElementById('error');
+            errorBox.textContent = message;
+            errorBox.classList.add('show');
+            setTimeout(() => errorBox.classList.remove('show'), 5000);
+        }
+
+        async function berechne() {
+            // Eingaben validieren
+            const alter = document.getElementById('alter').value;
+            const gewicht = document.getElementById('gewicht').value;
+            const stadt = document.getElementById('stadt').value;
+            const sportStunden = document.getElementById('sportStunden').value;
+            const intensität = document.getElementById('intensität').value;
+            const getrunkeneGläser = document.getElementById('getrunkeneGläser').value || 0;
+
+            if (!alter || !gewicht || !stadt || sportStunden === '') {
+                showError('❌ Bitte alle Felder ausfüllen!');
+                return;
+            }
+
+            if (alter < 1 || alter > 120) {
+                showError('❌ Alter muss zwischen 1 und 120 Jahren liegen!');
+                return;
+            }
+
+            if (gewicht < 20 || gewicht > 300) {
+                showError('❌ Gewicht muss zwischen 20 und 300 kg liegen!');
+                return;
+            }
+
+            try {
+                // Temperatur abrufen
+                const temperatur = await getTemperatur(stadt);
+                
+                // Wassermenge berechnen
+                const ergebnisse = berechnungslogik(
+                    parseFloat(alter),
+                    parseFloat(gewicht),
+                    parseFloat(sportStunden),
+                    parseFloat(intensität),
+                    temperatur,
+                    parseFloat(getrunkeneGläser)
+                );
+
+                // Ergebnisse anzeigen
+                zeigeErgebnisse(ergebnisse, temperatur, getrunkeneGläser);
+
+            } catch (error) {
+                console.error('Fehler:', error);
+                showError('❌ Fehler bei der Temperaturabfrage. Bitte überprüfe die Stadt!');
+            }
+        }
+
+        async function getTemperatur(stadt) {
+            try {
+                // Geocoding: Stadt zu Koordinaten
+                const geoResponse = await fetch(
+                    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(stadt)}&count=1&language=de&format=json`
+                );
+                const geoData = await geoResponse.json();
+
+                if (!geoData.results || geoData.results.length === 0) {
+                    throw new Error('Stadt nicht gefunden');
+                }
+
+                const { latitude, longitude } = geoData.results[0];
+
+                // Wetter abrufen
+                const weatherResponse = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&timezone=auto`
+                );
+                const weatherData = await weatherResponse.json();
+                
+                return weatherData.current.temperature_2m;
+            } catch (error) {
+                console.error('Fehler bei Temperaturabfrage:', error);
+                throw error;
+            }
+        }
+
+        function berechnungslogik(alter, gewicht, sportStunden, intensität, temperatur, getrunkeneGläser) {
+            // ✅ Basis-Wassermenge: 35ml pro kg
+            const basisMenge = gewicht * 0.035;
+
+            // ✅ Sport-Zusatz: 0.5-1L pro Stunde (je nach Intensität)
+            const sportFaktor = 0.5 + (intensität / 10) * 0.5; // 0.5 bis 1.0L
+            const sportZusatz = sportStunden * sportFaktor;
+
+            // ✅ Temperatur-Ausgleich: 1L wenn über 25°C
+            const temperaturZusatz = temperatur > 25 ? 1.0 : 0;
+
+            // Alter-Faktor (optional)
+            let alterFaktor = 1;
+            if (alter > 65) {
+                alterFaktor = 1.2;
+            } else if (alter < 18) {
+                alterFaktor = 0.9;
+            }
+
+            // Gesamtmenge
+            const gesamtMenge = (basisMenge + sportZusatz + temperaturZusatz) * alterFaktor;
+
+            // In Gläser umwandeln (1 Glas = 0.25L)
+            const glasGröße = 0.25;
+            const empfohlenGläser = Math.round(gesamtMenge / glasGröße);
+            const basisGläser = Math.round(basisMenge / glasGröße);
+            const sportGläser = Math.round(sportZusatz / glasGröße);
+            const temperaturGläser = Math.round(temperaturZusatz / glasGröße);
+
+            const verbleibendGläser = Math.max(0, empfohlenGläser - getrunkeneGläser);
+            const fortschritt = Math.min(100, (getrunkeneGläser / empfohlenGläser) * 100);
+
+            return {
+                basisMenge: gesamtMenge,
+                empfohlenGläser: empfohlenGläser,
+                basisGläser: basisGläser,
+                sportGläser: sportGläser,
+                temperaturGläser: temperaturGläser,
+                getrunkeneGläser: parseInt(getrunkeneGläser),
+                verbleibendGläser: verbleibendGläser,
+                fortschritt: fortschritt
+            };
+}
+        function zeigeErgebnisse(ergebnisse, temperatur, getrunkeneGläser) {
+            document.getElementById('temperatur').textContent = `${temperatur}°C`;
+            
+            document.getElementById('empfohlenGläser').textContent = 
+                `${ergebnisse.empfohlenGläser} Gläser (${(ergebnisse.basisMenge).toFixed(2)}L)`;
+            
+            document.getElementById('basisMenge').textContent = 
+                `${ergebnisse.basisGläser} Gläser`;
+            
+            document.getElementById('sportZusatz').textContent = 
+                `${ergebnisse.sportGläser} Gläser`;
+            
+            // ✅ Temperatur-Zusatz anzeigen
+            const infoBox = document.getElementById('sportZusatz');
+            infoBox.innerHTML += `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.3);">
+                <div class="result-label">🌡️ Temperatur-Zusatz:</div>
+                <div>${ergebnisse.temperaturGläser} Gläser</div>
+            </div>`;
+
+            // Fortschritt-Balken
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = ergebnisse.fortschritt + '%';
+            
+            const progressText = document.getElementById('progressText');
+            if (ergebnisse.fortschritt > 20) {
+                progressText.textContent = Math.round(ergebnisse.fortschritt) + '%';
+            }
+
+            document.getElementById('progressInfo').textContent = 
+                `${ergebnisse.getrunkeneGläser} / ${ergebnisse.empfohlenGläser} Gläser (noch ${ergebnisse.verbleibendGläser})`;
+
+            document.getElementById('results').classList.add('show');
+
+            if (ergebnisse.verbleibendGläser === 0) {
+                setTimeout(() => {
+                    alert('🎉 Glückwunsch! Du hast dein Tagesziel erreicht!');
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
